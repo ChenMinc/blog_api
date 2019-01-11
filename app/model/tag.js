@@ -2,27 +2,26 @@
 
 const [ PAGE, PAGESIZE ] = [ 1, 10 ]; // 当前页，页大小默认值
 module.exports = app => {
-  const { STRING, INTEGER, BIGINT } = app.Sequelize;
+  const { STRING, INTEGER, Op } = app.Sequelize;
   const Tag = app.model.define('tag', {
     tagId: { type: INTEGER, primaryKey: true }, // 标签id
-    title: { type: STRING }, // 标签名
-    status: { type: STRING, allowNull: false, defaultValue: '0' }, // 文章状态 0 未上线 1 上线中
-    quantity: { type: BIGINT, allowNull: false, defaultValue: 0 }, // 阅读人数
+    tagName: { type: STRING, unique: true }, // 标签名
+    status: { type: STRING, allowNull: false, defaultValue: '1' }, // 标签状态 0 未上线 1 上线中
   });
 
-  // Article.sync({ force: true });
-  // Article.sync({ force: true }).then(() => {
-  //   return Article.create({
-  //     title: '标签1',
-  //     quantity: 20,
+  // Tag.sync({ force: true });
+  // Tag.sync({ force: true }).then(() => {
+  //   return Tag.create({
+  //     tagName: '标签1',
+  //     status: '1',
   //   });
   // });
 
   // 查询列表
-  Tag.getList = function({ params, page, pageSize }) {
+  Tag.getList = function({ keyword, page, pageSize }) {
     page = page || PAGE;
     pageSize = pageSize || PAGESIZE;
-    params = params || '';
+    const params = keyword ? { tagname: { [Op.like]: '%' + keyword + '%' } } : '';
     return this.findAndCountAll({
       where: params,
       offset: (page - 1) * pageSize,
@@ -33,38 +32,46 @@ module.exports = app => {
     });
   };
 
-  // 根据参数获取文章
-  Tag.getArticleByArgs = function(params, exclude) {
-    return this.findOne({
-      where: params,
-      attributes: {
-        exclude: exclude.split(','),
-      },
+  // 获取所有
+  Tag.getAll = function() {
+    return this.findAll({
+      order: [
+        [ 'createdAt' ],
+      ],
     });
   };
 
-  // 插入一条文章记录
-  Tag.createArticle = function(params) {
+  // 查询一条记录
+  Tag.getTagByArgs = function(params) {
+    return this.findOne({
+      where: params,
+    });
+  };
+
+  // 插入一条记录
+  Tag.createTag = function(params) {
     return this.create(params);
   };
 
   // 更新/插入一条记录
-  Tag.upsertArticle = function(params) {
+  Tag.upsertTag = function(params) {
     return this.upsert(params);
   };
 
   // 更新一条文章记录 返回修改个数 [num]
-  Tag.updateArticle = function(params, exclude) {
+  Tag.updateTag = function(params, exclude) {
     const option = {
       where: exclude || {},
     };
     return this.update(params, option);
   };
 
-  // 记录上次登录时间
-  // User.prototype.login = async function() {
-  //   await this.update({ lastSignInAt: new Date() });
-  // };
+  // 删除记录
+  Tag.deleteInstances = function(params) {
+    return this.destroy({
+      where: params,
+    });
+  };
 
   return Tag;
 };

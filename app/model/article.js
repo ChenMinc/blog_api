@@ -2,22 +2,20 @@
 
 const [ PAGE, PAGESIZE ] = [ 1, 10 ]; // 当前页，页大小默认值
 module.exports = app => {
-  const { STRING, INTEGER, TEXT, BIGINT } = app.Sequelize;
+  const { STRING, INTEGER, TEXT, BIGINT, Op } = app.Sequelize;
   const Article = app.model.define('article', {
     articleId: { type: INTEGER, primaryKey: true }, // 文章id
-    title: { type: STRING }, // 文章名
-    content: { type: TEXT, unique: true, allowNull: false }, // 文章内容
+    title: { type: STRING, unique: true }, // 文章名
+    content: { type: TEXT, allowNull: false }, // 文章内容
     status: { type: STRING, allowNull: false, defaultValue: '0' }, // 文章状态 0 未上线 1 上线中
     quantity: { type: BIGINT, allowNull: false, defaultValue: 0 }, // 阅读人数
   });
 
   // Article.sync({ force: true });
-  // Article.sync({ force: true }).then(() => {
-  //   return Article.create({
-  //     title: '每2',
-  //     content: '我要来看看如何吧2s',
-  //     quantity: 20,
-  //   });
+  // Article.create({
+  //   title: '每12errt31232',
+  //   content: '我要来ryty看34545看如何吧2s',
+  //   quantity: 20,
   // });
 
   // 获取文章列表
@@ -26,10 +24,10 @@ module.exports = app => {
   };
 
   // 查询列表
-  Article.getList = function({ params, page, pageSize }) {
+  Article.getList = function({ keyword, page, pageSize }) {
     page = page || PAGE;
     pageSize = pageSize || PAGESIZE;
-    params = params || '';
+    const params = keyword ? { title: { [Op.like]: '%' + keyword + '%' } } : '';
     return this.findAndCountAll({
       where: params,
       offset: (page - 1) * pageSize,
@@ -68,10 +66,12 @@ module.exports = app => {
     return this.update(params, option);
   };
 
-  // 记录上次登录时间
-  // User.prototype.login = async function() {
-  //   await this.update({ lastSignInAt: new Date() });
-  // };
+  // 删除记录
+  Article.deleteInstances = function(params) {
+    return this.destroy({
+      where: params,
+    });
+  };
 
   return Article;
 };
