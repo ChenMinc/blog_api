@@ -4,7 +4,7 @@ const [ PAGE, PAGESIZE ] = [ 1, 10 ]; // 当前页，页大小默认值
 module.exports = app => {
   const { STRING, INTEGER, TEXT, BIGINT, Op } = app.Sequelize;
   const Article = app.model.define('article', {
-    articleId: { type: INTEGER, primaryKey: true }, // 文章id
+    articleId: { type: INTEGER, primaryKey: true }, // 文章ID
     title: { type: STRING, unique: true }, // 文章名
     content: { type: TEXT, allowNull: false }, // 文章内容
     status: { type: STRING, allowNull: false, defaultValue: '0' }, // 文章状态 0 未上线 1 上线中

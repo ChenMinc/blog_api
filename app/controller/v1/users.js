@@ -26,6 +26,11 @@ class UserController extends Controller {
 
     const resToken = ctx.service.auth.sign(user);
     ctx.body = { code: 0, message: 'success', data: { user, token: resToken } };
+    const params = {
+      accessToken: 'Bearer ' + resToken,
+      accessTokenExpiresAt: new Date(new Date().getTime() + 3600 * 24 * 7 * 1000),
+    };
+    await ctx.model.AccessToken.saveAccessToken(params, user);
   }
 
   // 暂没用上

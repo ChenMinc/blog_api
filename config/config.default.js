@@ -6,7 +6,7 @@ module.exports = appInfo => {
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1542622467450_2820';
 
-  config.middleware = [];
+  config.middleware = [ 'auth' ];
 
   // egg-sqlite
   config.sqlite3 = {
