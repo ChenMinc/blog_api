@@ -5,7 +5,7 @@ module.exports = () => {
   return async function auth(ctx, next) {
     await next();
     // 没有传token，直接返回错误
-    if (ctx.request.url !== '/api/v1/users/login') {
+    if (ctx.request.url !== '/api/v1/users/login' && ctx.request.url !== '/') {
       const token = ctx.header.authorization;
       if (!token) {
         ctx.body = {
